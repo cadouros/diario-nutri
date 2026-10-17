@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- Diário Nutri · Criado por Lift Like a Girl (@liftlikeagirl.xo) -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Diário Nutri</title>
+  <meta name="theme-color" content="#FAF6EC">
+  <meta name="color-scheme" content="light">
+  <!-- Faz o iPhone abrir como app, sem a barra do Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Diário Nutri">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icones/icone-180.png">
+  <link rel="icon" href="icones/icone-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Aqui dentro o JavaScript desenha a tela atual -->
+  <main id="tela"></main>
+
+  <!-- Barra inferior: Calendário, Hoje (centro, maior), Peso -->
+  <nav id="barra" class="barra">
+    <button type="button" data-tela="calendario" aria-label="Calendário">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="5" width="17" height="15.5" rx="3"/>
+        <path d="M3.5 10h17M8 3v4M16 3v4"/>
+      </svg>
+    </button>
+    <button type="button" data-tela="hoje" class="centro" aria-label="Hoje">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="3.5" width="16" height="17" rx="3"/>
+        <path d="M8 9.5l1.5 1.5 3-3M8 15.5h8"/>
+      </svg>
+    </button>
+    <button type="button" data-tela="peso" aria-label="Peso">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3.5 18.5l5-6 4 3 7.5-9"/>
+        <circle cx="8.5" cy="12.5" r="1.2"/><circle cx="12.5" cy="15.5" r="1.2"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script type="module" src="js/app.js"></script>
+  <script>
+    // Service worker (o "guardião" que salva os arquivos para uso offline).
+    // No computador (localhost) ele fica desligado, para cada mudança no código
+    // aparecer na hora ao recarregar a página.
+    if ("serviceWorker" in navigator) {
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
+      } else {
+        // "none": sempre confere o sw.js no site, sem usar cópia antiga do navegador
+        navigator.serviceWorker.register("sw.js", { scope: "./", updateViaCache: "none" }).then((registro) => {
+          // O iPhone deixa o app aberto em segundo plano; ao voltar para ele, procura versão nova
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") registro.update().catch(() => {});
+          });
+        });
+      }
+    }
+  </script>
+</body>
+</html>

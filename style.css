@@ -1,0 +1,1028 @@
+/* Todos os valores visuais ficam aqui, em variáveis (ver style.md).
+   Trocar uma cor ou um raio = mudar uma linha. */
+:root {
+  color-scheme: light; /* app sempre claro, mesmo com o iPhone no modo escuro */
+
+  /* Base */
+  --fundo: #FAF6EC;
+  --texto: #000000;
+  --neutro: #8A8A8A;        /* tracejado dos dias futuros */
+  --neutro-texto: #666666;  /* texto cinza (números dos dias futuros): contraste de 5:1 com o fundo */
+  --bege: #E6DEC8;
+
+  /* Estados: cheia (só barras e gráficos) e clarinha (fundo de quadradinhos e cartões).
+     O texto fica sempre preto, sobre a clarinha.
+     Verde = seguiu e sono bom; vermelho = livre e sono ruim. */
+  --seguiu: #8DB600;   --seguiu-clara: #CEDC8E;
+  --livre: #9C0720;    --livre-clara: #DEAEAF;
+  --sono-ok: #F2C94C;  --sono-ok-clara: #F8E5A5;
+  --fome: #F28C28;     --fome-clara: #F7CC9E;
+  --agua: #0197B4;     --agua-clara: #BCDEDE;
+  --habito: #6A4FA3;   --habito-clara: #D4CCEB;
+  --vazio-clara: #FAF6EC;
+
+  /* Tipografia */
+  --fonte: ui-rounded, system-ui, sans-serif;
+  --tam-titulo: 20px;
+  --tam-secao: 13px;
+  --tam-cartao: 15px;
+  --tam-detalhe: 12px;
+  --tam-campo: 16px;
+
+  /* Formas */
+  --toque-min: 44px;
+  --raio-cartao: 16px;
+  --raio-dia: 8px;
+  --raio-quadradinho: 2px;
+  --raio-pilula: 999px;
+  --borda-cartao: 1.5px;
+  --borda-dia: 1.5px;
+  --borda-quadradinho: 1px;
+  --borda-hoje: 2.5px;
+  --espaco-cartoes: 8px;
+  --espaco-dias: 4px;
+  --espaco-quadradinhos: 2px;
+  --sombra-barra: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --altura-barra: 60px;
+  --altura-refeicao: 52px;
+  --raio-mini: 10px; /* botão de qualidade do sono, dentro do cartão */
+  --altura-dia: 50px;
+  --quadradinho: 9px;
+  --sono-largura: 32px;
+  --sono-altura: 20px;
+  --raio-sono: 4px;
+  --altura-camada: 44px; /* style.md pede no mínimo 40px; 44px é o mínimo de toque */
+  --altura-continuar: 48px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: var(--tam-cartao);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  /* Não deixa o conteúdo ficar sob o entalhe nem sob a barra inferior */
+  padding: calc(env(safe-area-inset-top) + 12px) 16px
+           calc(env(safe-area-inset-bottom) + var(--altura-barra) + 40px);
+}
+
+button, input, textarea {
+  font: inherit;
+  color: var(--texto);
+}
+
+button {
+  /* Tira o visual padrão do navegador e o atraso/zoom de toque duplo */
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--fundo);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+h1 {
+  font-size: var(--tam-titulo);
+  font-weight: 600;
+  margin: 0;
+}
+
+.secao {
+  font-size: var(--tam-secao);
+  font-weight: 600;
+  margin: 20px 4px 8px;
+}
+
+.detalhe {
+  font-size: var(--tam-detalhe);
+  color: var(--texto);
+}
+
+/* ---------- Cabeçalho com setas ---------- */
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.seta {
+  width: var(--toque-min);
+  height: var(--toque-min);
+  border-radius: var(--raio-pilula);
+  font-size: 28px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seta:disabled {
+  color: var(--neutro);
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---------- Cartões ---------- */
+
+.cartao {
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-cartao);
+  background: var(--fundo);
+  font-size: var(--tam-cartao);
+}
+
+.grade2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espaco-cartoes);
+  margin-bottom: var(--espaco-cartoes);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-cartoes);
+  margin-bottom: var(--espaco-cartoes);
+}
+
+.espaco-acima { margin-top: 20px; }
+
+/* Cartão de toque */
+.toque {
+  width: 100%;
+  min-height: var(--toque-min);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  text-align: left;
+  border: var(--borda-cartao) solid var(--texto);
+}
+
+.toque .nome { flex: 1; }
+.toque .estado { font-size: var(--tam-detalhe); font-weight: 600; }
+.toque .icone { font-size: 22px; width: 28px; text-align: center; }
+
+.toque.grande { min-height: var(--altura-refeicao); }
+
+/* Cartões pequenos (resto do dia): nome em cima, estado embaixo */
+.toque.pequeno {
+  min-height: 64px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+.toque.pequeno .nome { flex: none; }
+
+/* Botão de qualidade do sono, dentro do cartão Sono */
+.toque.mini {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: var(--raio-mini);
+  border-width: var(--borda-quadradinho);
+  font-size: var(--tam-detalhe);
+}
+.toque.mini .estado { font-weight: 600; }
+
+/* Cor de fundo conforme o estado (sempre a versão clarinha) */
+[data-cor="vazio"]    { background: var(--vazio-clara); }
+[data-cor="verde"]    { background: var(--seguiu-clara); }
+[data-cor="vermelho"] { background: var(--livre-clara); }
+[data-cor="amarelo"]  { background: var(--sono-ok-clara); }
+[data-cor="laranja"]  { background: var(--fome-clara); }
+[data-cor="bege"]     { background: var(--bege); }
+[data-cor="lilas"]    { background: var(--habito-clara); }
+[data-cor="agua"]     { background: var(--agua-clara); }
+
+/* Cartões de peso e sono */
+.medida {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.linha-numero {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.linha-numero input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--toque-min);
+  font-size: 24px; /* no mínimo 16px, senão o iPhone dá zoom */
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: none;
+  border-bottom: var(--borda-quadradinho) solid var(--texto);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  outline: none;
+}
+
+.linha-numero input.invalido {
+  border-bottom: 2px solid var(--fome);
+}
+
+/* Campos de texto (o que comi, horário da fome, nota) */
+.texto {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: var(--tam-campo);
+  resize: none;
+  outline: none;
+}
+
+.texto[hidden] { display: none; }
+
+/* O campo cresce com o texto (a altura é ajustada em hoje.js); nunca rola por dentro */
+textarea.texto { overflow: hidden; min-height: 72px; line-height: 1.4; }
+
+/* ---------- Água em copinhos ---------- */
+
+.agua { padding: 10px 10px 12px; }
+
+.copos {
+  display: flex;
+  flex-wrap: wrap;   /* quebra em duas linhas se precisar */
+  gap: 2px;
+}
+
+/* Cada copo: no mínimo 44px de toque */
+.copo {
+  width: var(--toque-min);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.copo svg { width: 32px; height: 40px; }
+
+.contorno-copo {
+  fill: none;
+  stroke: var(--texto);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* Copo além da meta: contorno tracejado */
+.copo.extra .contorno-copo { stroke-dasharray: 3 2; }
+
+.agua-copo { fill: var(--agua); }
+
+/* Leve linha de "nível da água" no topo */
+.nivel-copo {
+  fill: none;
+  stroke: var(--agua-clara);
+  stroke-width: 1.5;
+}
+
+.texto-agua {
+  margin: 8px 4px 0;
+  font-size: var(--tam-cartao);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Meta atingida: fundo azul-petróleo clarinho (texto continua preto, para ter contraste) */
+.texto-agua.meta-atingida {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--raio-pilula);
+  background: var(--agua-clara);
+}
+
+/* Banheiro: nome à esquerda, − número + à direita */
+.banheiro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 6px 14px;
+  margin-bottom: var(--espaco-cartoes);
+}
+
+.contador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contador .numero {
+  min-width: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.redondo {
+  width: var(--toque-min);
+  height: var(--toque-min);
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Calendário ---------- */
+
+.titulo-mes { flex: 1; text-align: center; }
+.engrenagem { font-size: 22px; }
+
+/* Botões de camada: cores definidas explicitamente para o navegador não mudar nada */
+.camadas {
+  display: flex;
+  gap: var(--espaco-cartoes);
+  margin-bottom: 14px;
+}
+
+.camada {
+  flex: 1;
+  min-height: var(--altura-camada);
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  background: var(--fundo);
+  color: var(--texto);
+  font-size: var(--tam-cartao);
+}
+
+.camada.ativa {
+  background: var(--texto);
+  color: var(--fundo);
+}
+
+.semana, .mes {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--espaco-dias);
+}
+
+.semana {
+  font-size: 11px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Bloco do dia */
+.dia {
+  min-width: 0;
+  height: var(--altura-dia);
+  border: var(--borda-dia) solid var(--texto);
+  border-radius: var(--raio-dia);
+  background: var(--fundo);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-quadradinhos);
+  padding-top: 3px;
+}
+
+.dia .num {
+  font-size: 11px;
+  line-height: 14px;
+  margin-bottom: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dia.hoje { border-width: var(--borda-hoje); padding-top: 2px; }
+.dia.hoje .num { font-weight: 700; }
+
+.dia.futuro {
+  border-style: dashed;
+  border-color: var(--neutro);
+  color: var(--neutro-texto);
+}
+
+.linha-q {
+  display: flex;
+  gap: var(--espaco-quadradinhos);
+}
+
+.quadradinho {
+  display: inline-block;
+  width: var(--quadradinho);
+  height: var(--quadradinho);
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-quadradinho);
+  flex: none;
+}
+
+.sono-ret {
+  width: var(--sono-largura);
+  height: var(--sono-altura);
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-sono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Legenda embaixo do calendário */
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 14px;
+  font-size: var(--tam-detalhe);
+}
+
+.legenda .item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legenda .quadradinho {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Relatórios ---------- */
+
+.relatorio {
+  padding: 12px 14px;
+  margin-bottom: var(--espaco-cartoes);
+  font-size: var(--tam-secao);
+}
+
+.relatorio h2 {
+  font-size: var(--tam-cartao);
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.relatorio h3 {
+  font-size: var(--tam-secao);
+  font-weight: 600;
+  margin: 12px 0 2px;
+}
+
+.relatorio p { margin: 4px 0; }
+
+.relatorio strong { font-variant-numeric: tabular-nums; }
+
+/* Gráficos: preto, linhas finas, quase sem grade */
+.grafico {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+
+.linha-grafico {
+  fill: none;
+  stroke: var(--texto);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ponto-grafico {
+  fill: var(--texto);
+  stroke: var(--fundo);
+  stroke-width: 2;
+}
+
+.eixo-grafico {
+  stroke: var(--texto);
+  stroke-width: 1;
+}
+
+.rotulo-grafico {
+  font-family: var(--fonte);
+  font-size: 11px;
+  fill: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.rotulo-grafico.destaque { font-size: 13px; font-weight: 600; }
+
+/* Cor cheia (barras e amostras da legenda) */
+.cheia[data-cor="verde"]    { fill: var(--seguiu); }
+.cheia[data-cor="amarelo"]  { fill: var(--sono-ok); }
+.cheia[data-cor="vermelho"] { fill: var(--livre); }
+.cheia[data-cor="vazio"]    { fill: var(--fundo); stroke: var(--texto); stroke-width: 1; }
+
+.quadradinho.cheio[data-cor="verde"]    { background: var(--seguiu); }
+.quadradinho.cheio[data-cor="amarelo"]  { background: var(--sono-ok); }
+.quadradinho.cheio[data-cor="vermelho"] { background: var(--livre); }
+
+.legenda.pequena { margin-top: 6px; font-size: 11px; }
+.legenda.pequena .quadradinho { width: 10px; height: 10px; }
+
+/* Nomes dos dias e 💩 empilhados, alinhados com as 7 colunas do gráfico */
+.dias7 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+}
+
+.dias7 > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Um 💩 embaixo do outro */
+.cocos {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  line-height: 13px;
+  margin-top: 2px;
+}
+
+.livres { margin-top: 8px; }
+
+/* "em andamento" ao lado do título da semana */
+.etiqueta {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  font-size: var(--tam-detalhe);
+  font-weight: 400;
+  vertical-align: 2px;
+}
+
+/* Dia da semana que não entra nas contas (é do outro mês) */
+.dias7 > span.fora { color: var(--neutro-texto); }
+
+.livres summary {
+  min-height: var(--toque-min);
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.livres ul { margin: 0; padding-left: 18px; }
+.livres li { margin-bottom: 6px; }
+.livres .quando { display: block; font-size: 11px; }
+
+/* Aba Peso: o gráfico rola para os lados quando o histórico cresce */
+.rolagem-grafico {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 0;
+  margin: 12px 0 var(--espaco-cartoes);
+}
+
+.grafico-acumulado { display: block; }
+
+.alvo-toque { fill: transparent; cursor: pointer; }
+
+/* ---------- Backup e Ajustes ---------- */
+
+.faixa-backup {
+  display: block;
+  width: 100%;
+  min-height: var(--toque-min);
+  margin-bottom: var(--espaco-cartoes);
+  padding: 8px 14px;
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  background: var(--fundo);
+  color: var(--texto);
+  font-size: var(--tam-secao);
+  text-align: center;
+}
+
+.faixa-backup.destaque {
+  border-width: var(--borda-cartao);
+  background: var(--fome-clara);
+  font-weight: 600;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-cartoes);
+  margin-top: 10px;
+}
+
+.botao {
+  flex: 1;
+  min-height: var(--toque-min);
+  padding: 8px 14px;
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  background: var(--fundo);
+  color: var(--texto);
+  font-size: var(--tam-cartao);
+  white-space: nowrap;
+}
+
+.botao.principal {
+  background: var(--texto);
+  color: var(--fundo);
+}
+
+.botao.perigo {
+  background: var(--fome-clara);
+  font-weight: 600;
+}
+
+.aviso-importacao {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-mini);
+  background: var(--bege);
+}
+
+/* ---------- PDF ---------- */
+
+/* Botão discreto "Gerar PDF" no resumo do mês e nos cartões semanais.
+   A área de toque tem 44px; a pílula visível é pequena. */
+.linha-pdf {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.botao-pdf {
+  min-height: var(--toque-min);
+  padding: 0 2px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.botao-pdf .texto-botao-pdf {
+  display: inline-block;
+  padding: 4px 12px;
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  font-size: var(--tam-detalhe);
+}
+
+/* Depois de gerar: "Compartilhar PDF" em destaque (pílula preta) */
+.botao-pdf.pronto .texto-botao-pdf {
+  background: var(--texto);
+  color: var(--fundo);
+}
+
+.botao-pdf:disabled { opacity: 0.6; }
+
+.botao.pronto {
+  background: var(--texto);
+  color: var(--fundo);
+}
+
+.periodo-pdf { margin: 6px 0; }
+.titulo-periodo { flex: 1; text-align: center; font-size: var(--tam-cartao); font-weight: 600; }
+
+.opcoes-pdf {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.opcao-pdf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--toque-min);
+  font-size: var(--tam-cartao);
+}
+
+.opcao-pdf input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--texto);
+}
+
+.botao:disabled { opacity: 0.4; }
+
+/* ---------- Boas-vindas e instalação ---------- */
+
+.boas-vindas { font-size: 16px; line-height: 1.45; }
+.boas-vindas h1 { margin: 8px 0 12px; }
+.boas-vindas p { margin: 8px 0; }
+
+.destaque-privacidade { font-weight: 600; }
+
+.passo-instalacao {
+  padding: 14px 16px;
+  margin: 14px 0;
+  font-size: 16px;
+}
+
+.passo-instalacao h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.passos { margin: 12px 0 8px; padding-left: 22px; }
+.passos li { margin-bottom: 8px; }
+
+/* Desenho do botão Compartilhar no meio do texto */
+.icone-inline {
+  width: 20px;
+  height: 20px;
+  vertical-align: -4px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.aviso-forte {
+  padding: 12px 14px;
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-mini);
+  background: var(--fome-clara);
+}
+
+.credito {
+  margin: 28px 0 8px;
+  text-align: center;
+  font-size: var(--tam-secao);
+}
+
+.credito a, .credito-sobre a { color: var(--texto); }
+.credito-sobre { margin-top: 10px; }
+
+/* Link do crédito com área de toque confortável */
+.credito a, .credito-sobre a {
+  display: inline-block;
+  min-height: var(--toque-min);
+  line-height: var(--toque-min);
+}
+
+/* ---------- Perfil ---------- */
+
+.perfil { font-size: 16px; line-height: 1.4; }
+.perfil h1 { margin: 4px 0 10px; }
+.perfil > p { margin: 8px 0; }
+.passo-de { margin: 0 0 4px; }
+
+.bloco-texto { padding: 6px 16px; }
+
+.rotulo {
+  display: block;
+  font-size: var(--tam-secao);
+  font-weight: 600;
+  margin: 16px 4px 6px;
+}
+
+/* Campos digitáveis: no mínimo 16px, senão o iPhone dá zoom */
+.campo-perfil, .campo-lista {
+  font-size: var(--tam-campo);
+  min-height: var(--toque-min);
+  border: var(--borda-cartao) solid var(--texto);
+  border-radius: var(--raio-mini);
+  background: var(--fundo);
+  padding: 8px 12px;
+  outline: none;
+}
+
+.campo-perfil { width: 100%; }
+.campo-perfil.curto { width: 90px; font-variant-numeric: tabular-nums; }
+
+.linha-idade { display: flex; align-items: center; gap: 8px; }
+
+.lista-perfil {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-cartoes);
+}
+
+.item-perfil {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+}
+
+.item-perfil .campo-lista {
+  flex: 1;
+  min-width: 0;
+  border-width: var(--borda-quadradinho);
+}
+
+.item-perfil.arquivado {
+  padding-left: 14px;
+  border-style: dashed;
+}
+.item-perfil.arquivado .nome { flex: 1; }
+.item-perfil.arquivado .botao { flex: none; }
+
+/* Subir, descer e remover: 44px de toque */
+.botao-icone {
+  flex: none;
+  width: var(--toque-min);
+  height: var(--toque-min);
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icone-botao {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.botao-icone:disabled, .redondo:disabled { opacity: 0.3; cursor: default; }
+
+/* Sugestões tocáveis */
+.pilulas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-cartoes);
+}
+
+.pilula {
+  min-height: var(--toque-min);
+  padding: 8px 16px;
+  border: var(--borda-quadradinho) solid var(--texto);
+  border-radius: var(--raio-pilula);
+  background: var(--fundo);
+  color: var(--texto);
+  font-size: var(--tam-cartao);
+}
+
+/* Meta de água: − 4 copos + */
+.agua-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.numero-grande {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.equivalencia { text-align: center; font-weight: 600; }
+
+.resumo-perfil { padding: 6px 16px 12px; margin: 12px 0; }
+.resumo-perfil dt { font-size: var(--tam-secao); font-weight: 600; margin-top: 10px; }
+.resumo-perfil dd { margin: 2px 0 0; }
+.resumo-perfil ol { margin: 0; padding-left: 20px; }
+
+.erro { font-weight: 600; min-height: 1em; }
+.erro:empty { margin: 0; }
+
+.navegacao-perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+}
+
+/* "Continuar": pílula preta com texto off-white */
+.botao-continuar {
+  width: 100%;
+  min-height: var(--altura-continuar);
+  border-radius: var(--raio-pilula);
+  background: var(--texto);
+  color: var(--fundo);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* "Voltar": só texto */
+.botao-texto {
+  min-height: var(--toque-min);
+  padding: 0 16px;
+  background: transparent;
+  text-decoration: underline;
+  font-size: 16px;
+}
+
+/* "Já tenho backup", embaixo do primeiro passo do perfil */
+.ja-tenho {
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: var(--borda-quadradinho) solid var(--bege);
+  text-align: center;
+}
+
+.ja-tenho .aviso-importacao { text-align: left; }
+
+/* Ajustes > Ajuda: itens que abrem ao tocar */
+.ajuda { font-size: var(--tam-cartao); line-height: 1.45; }
+
+.item-ajuda { border-top: var(--borda-quadradinho) solid var(--bege); }
+
+.item-ajuda summary {
+  min-height: var(--toque-min);
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.item-ajuda .passos, .item-ajuda ul { margin: 4px 0 10px; padding-left: 22px; }
+.item-ajuda li { margin-bottom: 6px; }
+.item-ajuda h3 { margin: 10px 0 0; }
+
+/* Ajustes > Seu perfil */
+.linha-ajuste {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: var(--borda-quadradinho) solid var(--bege);
+  font-size: var(--tam-cartao);
+}
+.linha-ajuste:first-of-type { border-top: none; }
+.rotulo-ajuste { font-size: var(--tam-detalhe); font-weight: 600; }
+.botao.estreito { flex: none; }
+
+/* ---------- Barra inferior ---------- */
+
+.barra {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  width: min(300px, calc(100% - 32px));
+  height: var(--altura-barra);
+  padding: 0 14px;
+  border-radius: var(--raio-pilula);
+  background: var(--texto);
+  box-shadow: var(--sombra-barra);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.barra[hidden] { display: none; }
+
+.barra button {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--raio-pilula);
+  background: transparent;
+  color: var(--fundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barra button.centro { width: 52px; height: 52px; }
+
+.barra button.ativo {
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+.barra svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.barra .centro svg { width: 28px; height: 28px; }
