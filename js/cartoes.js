@@ -17,7 +17,7 @@ import {
 } from "./formato.js";
 import {
   datasAteHoje, resumirRefeicoes, mediaDoCampo, contarMetaAgua, listarLivres,
-  temRegistros, contarHabitos, listarFome,
+  temRegistros, listarFome,
 } from "./relatorios.js";
 import { graficoPesoSemana, graficoSonoSemana } from "./graficos.js";
 import { ESTADOS, RELATORIOS as T, PDF as TPDF } from "./textos.js";
@@ -131,7 +131,6 @@ function cartaoSemanal(segunda, ano, mes, porData, perfil) {
     </div>`;
 
   const corSono = (valor) => infoValor("sonoQualidade", valor).cor;
-  const habitos = contarHabitos(porData, datas, perfil);
   const livres = listarLivres(porData, datas, perfil)
     .map((l) => ({ quando: `${formatarDiaCurto(l.data)} · ${escapar(l.refeicao)}`, texto: l.texto }));
   const fome = listarFome(porData, datas)
@@ -145,9 +144,6 @@ function cartaoSemanal(segunda, ano, mes, porData, perfil) {
       ${graficoPesoSemana(registros.map((r) => r.peso))}
       ${colunasDias(true)}
       <p>${linhaAgua(porData, datas, perfil, true)}</p>
-      ${habitos.length === 0 ? "" : `
-        <h3>${T.habitosTitulo}</h3>
-        ${habitos.map((h) => `<p>${T.habito(escapar(h.nome), h.sim, h.marcados)}</p>`).join("")}`}
       <h3>${T.sonoTitulo}</h3>
       ${graficoSonoSemana(registros)}
       ${colunasDias(false)}
@@ -155,7 +151,6 @@ function cartaoSemanal(segunda, ano, mes, porData, perfil) {
         <span class="item"><span class="quadradinho cheio" data-cor="${corSono("boa")}"></span>${ESTADOS.sono_boa}</span>
         <span class="item"><span class="quadradinho cheio" data-cor="${corSono("ok")}"></span>${ESTADOS.sono_ok}</span>
         <span class="item"><span class="quadradinho cheio" data-cor="${corSono("ruim")}"></span>${ESTADOS.sono_ruim}</span>
-        <span class="item"><span class="quadradinho cheio" data-cor="vazio"></span>${T.sonoSemQualidade}</span>
       </div>
       ${listaRecolhida(T.livresTitulo(livres.length), livres, T.semLivres)}
       ${listaRecolhida(T.fomeTitulo(fome.length), fome, T.semFome)}

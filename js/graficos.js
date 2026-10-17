@@ -42,6 +42,7 @@ export function graficoPesoSemana(pesos) {
 }
 
 // Sono da semana: barras com altura = horas e cor = qualidade.
+// Horas sem qualidade marcada: barra em cinza neutro (sem item na legenda).
 // "dias" é uma lista de 7 registros (ou {}).
 export function graficoSonoSemana(dias) {
   const ALTURA = 84, TOPO = 16, BASE = ALTURA - 2, LARGURA_BARRA = 22;
@@ -51,7 +52,7 @@ export function graficoSonoSemana(dias) {
     if (d.sono_horas === undefined) return "";
     const h = (d.sono_horas / maximo) * (BASE - TOPO);
     const x = centro(i) - LARGURA_BARRA / 2;
-    const cor = infoValor("sonoQualidade", d.sono_qualidade).cor;
+    const cor = d.sono_qualidade ? infoValor("sonoQualidade", d.sono_qualidade).cor : "neutro";
     return `
       <rect class="cheia" data-cor="${cor}" x="${x}" y="${BASE - h}" width="${LARGURA_BARRA}" height="${h}" rx="4"/>
       <text class="rotulo-grafico" x="${centro(i)}" y="${BASE - h - 4}" text-anchor="middle">${formatarNumero(d.sono_horas, 0)}</text>`;

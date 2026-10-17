@@ -208,6 +208,7 @@ h1 {
 [data-cor="bege"]     { background: var(--bege); }
 [data-cor="lilas"]    { background: var(--habito-clara); }
 [data-cor="agua"]     { background: var(--agua-clara); }
+[data-cor="neutro"]   { background: var(--neutro); } /* sono com horas, sem qualidade */
 
 /* Cartões de peso e sono */
 .medida {
@@ -525,7 +526,7 @@ textarea.texto { overflow: hidden; min-height: 72px; line-height: 1.4; }
 .cheia[data-cor="verde"]    { fill: var(--seguiu); }
 .cheia[data-cor="amarelo"]  { fill: var(--sono-ok); }
 .cheia[data-cor="vermelho"] { fill: var(--livre); }
-.cheia[data-cor="vazio"]    { fill: var(--fundo); stroke: var(--texto); stroke-width: 1; }
+.cheia[data-cor="neutro"]   { fill: var(--neutro); } /* horas sem qualidade marcada */
 
 .quadradinho.cheio[data-cor="verde"]    { background: var(--seguiu); }
 .quadradinho.cheio[data-cor="amarelo"]  { background: var(--sono-ok); }
@@ -600,25 +601,14 @@ textarea.texto { overflow: hidden; min-height: 72px; line-height: 1.4; }
 
 /* ---------- Backup e Ajustes ---------- */
 
-.faixa-backup {
-  display: block;
-  width: 100%;
-  min-height: var(--toque-min);
-  margin-bottom: var(--espaco-cartoes);
-  padding: 8px 14px;
-  border: var(--borda-quadradinho) solid var(--texto);
-  border-radius: var(--raio-pilula);
-  background: var(--fundo);
-  color: var(--texto);
-  font-size: var(--tam-secao);
-  text-align: center;
+/* Aviso de backup, no fim do Calendário */
+.aviso-backup {
+  margin-top: 16px;
+  padding: 12px 14px;
+  font-size: var(--tam-cartao);
 }
 
-.faixa-backup.destaque {
-  border-width: var(--borda-cartao);
-  background: var(--fome-clara);
-  font-weight: 600;
-}
+.aviso-backup p { margin: 0; }
 
 .botoes {
   display: flex;

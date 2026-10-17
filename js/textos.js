@@ -221,12 +221,7 @@ export const RELATORIOS = {
   aguaMedia: (mediaTexto, marcados) => marcados === 0
     ? ""
     : ` · média de ${mediaTexto} copos por dia marcado`,
-  habito: (nome, sim, marcados) => marcados === 0
-    ? `${nome}: nenhum dia marcado`
-    : `${nome}: sim em ${sim} de ${pl(marcados, "dia marcado", "dias marcados")}`,
-  habitosTitulo: "Hábitos extras",
   sonoTitulo: "Sono",
-  sonoSemQualidade: "qualidade sem marcar",
   livresTitulo: (n) => `O que comi nas refeições livres (${n})`,
   semLivres: "Nenhuma refeição livre.",
   fomeTitulo: (n) => `Fome (${n})`,
@@ -276,11 +271,12 @@ export const BACKUP = {
   jaTenho: "Já tenho backup",
   jaTenhoExplica: "Trocou de celular? Escolha o arquivo de backup (diario-nutri-backup.json) para trazer o seu perfil e o seu histórico.",
 
-  // Faixa no topo do Calendário
-  faixaNenhum: "Você ainda não fez nenhum backup. Toque para fazer.",
-  faixaHoje: "Último backup hoje",
-  faixaHa: (n) => `Último backup há ${n === 1 ? "1 dia" : `${n} dias`}`,
-  diasParaDestaque: 7, // a partir de quantos dias a faixa fica em destaque
+  // Aviso no fim do Calendário: só aparece depois de 30 dias de uso sem backup,
+  // ou 30 dias depois do último backup. Texto neutro.
+  avisoNenhum: "Seus dados ficam só neste celular. Um backup guarda uma cópia deles, para você não perder o histórico se trocar de celular.",
+  avisoHa: (n) => `Seu último backup foi há ${n} dias. Um backup novo guarda também os registros mais recentes.`,
+  fazerBackup: "Fazer backup",
+  diasParaAviso: 30,
 };
 
 export const CSV = {
@@ -381,7 +377,7 @@ export const AJUDA = {
     "Aqui em Ajustes, toque em <strong>Exportar backup</strong>.",
     "No iPhone, escolha <strong>Salvar em Arquivos</strong>, depois <strong>iCloud Drive</strong>, e toque em <strong>Salvar</strong>. No Android, escolha o <strong>Google Drive</strong> (ou <strong>Salvar no dispositivo</strong>).",
     "Se perguntar se quer substituir o arquivo anterior, toque em <strong>Substituir</strong>: o backup tem sempre o mesmo nome (<em>diario-nutri-backup.json</em>).",
-    "Faça isso pelo menos uma vez por semana. A faixa no topo do Calendário avisa quando faz tempo.",
+    "Faça backup de vez em quando. Depois de 30 dias sem backup, aparece um lembrete no fim do Calendário.",
   ],
 
   restaurarTitulo: "Como trazer os dados para um celular novo",

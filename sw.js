@@ -16,7 +16,7 @@
 // Importante: este arquivo NUNCA mexe nos dados do paciente (que ficam no IndexedDB).
 // Ele só cuida dos arquivos do app.
 
-const VERSAO = "v9";
+const VERSAO = "v10";
 // O prefixo "diarionutri-" separa esta cópia da de qualquer outro app no mesmo endereço
 const PREFIXO = "diarionutri-";
 const CACHE = PREFIXO + VERSAO;

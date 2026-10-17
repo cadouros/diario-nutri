@@ -270,13 +270,44 @@ export async function mostrarAjustes(tela, { aoVoltar, aoEditarPerfil }) {
   });
 }
 
-// Faixa no topo do Calendário: "Último backup há X dias", em destaque a partir de 7 dias
-export async function faixaBackup() {
-  const momento = await lerMeta("ultimoBackup");
-  if (!momento) {
-    return `<button type="button" class="faixa-backup destaque" id="faixa-backup">${TB.faixaNenhum}</button>`;
+// Aviso de backup no fim do Calendário. Só aparece:
+//   - sem nenhum backup: depois de 30 dias de uso (contados a partir do primeiro dia registrado);
+//   - com backup: 30 dias depois do último.
+// Devolve null (sem aviso) ou { html, ligar(tela, aoTerminar) }.
+// O arquivo fica pronto antes do toque, porque o iPhone só abre o menu de compartilhar logo depois dele.
+export async function avisoBackup() {
+  const [momento, dias] = await Promise.all([lerMeta("ultimoBackup"), todosOsDias()]);
+  const hoje = hojeISO();
+  let texto;
+  if (momento) {
+    const passados = diasEntre(momento.split("T")[0], hoje);
+    if (passados < TB.diasParaAviso) return null;
+    texto = TB.avisoHa(passados);
+  } else {
+    if (dias.length === 0) return null;
+    const primeiro = dias.map((d) => d.data).sort()[0];
+    if (diasEntre(primeiro, hoje) < TB.diasParaAviso) return null;
+    texto = TB.avisoNenhum;
   }
-  const dias = diasEntre(momento.split("T")[0], hojeISO());
-  const texto = dias === 0 ? TB.faixaHoje : TB.faixaHa(dias);
-  return `<button type="button" class="faixa-backup ${dias >= TB.diasParaDestaque ? "destaque" : ""}" id="faixa-backup">${texto}</button>`;
+  const conteudo = montarBackup(dias, await lerPerfil());
+  return {
+    html: `
+      <section class="cartao aviso-backup" id="aviso-backup">
+        <p>${texto}</p>
+        <div class="botoes">
+          <button type="button" class="botao principal" id="fazer-backup">${TB.fazerBackup}</button>
+        </div>
+      </section>`,
+    ligar: (tela, aoTerminar) => {
+      tela.querySelector("#fazer-backup").onclick = () => {
+        entregarArquivo(NOME_BACKUP, "application/json", conteudo)
+          .then(async (entregue) => {
+            if (!entregue) return; // fechou o menu sem escolher nada
+            await salvarMeta("ultimoBackup", agoraLocal());
+            aoTerminar(); // o aviso some
+          })
+          .catch((e) => alert(TB.erro + e.message));
+      };
+    },
+  };
 }

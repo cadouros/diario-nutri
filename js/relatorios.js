@@ -9,7 +9,7 @@
 //
 // "porData" é um objeto { "AAAA-MM-DD": registroDoDia } e "datas" é a lista de dias a considerar.
 
-import { refeicoesDoDia, habitosDoDia, todasAsRefeicoes } from "./modelo.js";
+import { refeicoesDoDia, todasAsRefeicoes } from "./modelo.js";
 import { somarDias, hojeISO, inicioDaSemana } from "./formato.js";
 
 // Todas as datas de "inicio" a "fim", sem passar de hoje
@@ -43,21 +43,6 @@ export function resumirRefeicoes(porData, datas, perfil) {
 // Algum dia da lista tem alguma coisa registrada?
 export function temRegistros(porData, datas) {
   return datas.some((d) => porData[d] !== undefined);
-}
-
-// Hábitos extras: para cada hábito que existia em algum dos dias, quantos "sim" e quantos dias marcados
-export function contarHabitos(porData, datas, perfil) {
-  const contas = new Map();
-  for (const data of datas) {
-    const dia = porData[data] || { data };
-    for (const h of habitosDoDia(perfil, dia)) {
-      if (!contas.has(h.id)) contas.set(h.id, { nome: h.nome, sim: 0, marcados: 0 });
-      const v = dia.habitos?.[h.id];
-      if (v !== undefined) contas.get(h.id).marcados++;
-      if (v === "sim") contas.get(h.id).sim++;
-    }
-  }
-  return [...contas.values()];
 }
 
 // Dias com fome, com o texto (horário e observação), se escreveu

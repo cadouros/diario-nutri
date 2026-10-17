@@ -14,7 +14,7 @@ import {
 } from "./formato.js";
 import { ESTADOS, CALENDARIO as T } from "./textos.js";
 import { resumoMensal, cartoesSemanais } from "./cartoes.js";
-import { faixaBackup } from "./ajustes.js";
+import { avisoBackup } from "./ajustes.js";
 import { ligarBotaoPdf } from "./pdfbotao.js";
 
 const CAMADAS = ["refeicoes", "habitos", "sono"];
@@ -73,7 +73,9 @@ function conteudoDia(dia, perfil) {
     return emLinhas(q, linhasHabitos(q.length));
   }
   const horas = dia.sono_horas === undefined ? "" : formatarNumero(dia.sono_horas, 0);
-  return `<span class="sono-ret" data-cor="${infoValor("sonoQualidade", dia.sono_qualidade).cor}">${horas}</span>`;
+  // Cor da qualidade; horas sem qualidade ficam em cinza neutro; nada marcado fica vazio
+  const cor = dia.sono_qualidade ? infoValor("sonoQualidade", dia.sono_qualidade).cor : horas ? "neutro" : "vazio";
+  return `<span class="sono-ret" data-cor="${cor}">${horas}</span>`;
 }
 
 function montarGrade(porData, perfil) {
@@ -130,7 +132,7 @@ function montarLegenda(perfil) {
   return `
     <div class="legenda">
       ${itemCor("verde", ESTADOS.sono_boa)}${itemCor("amarelo", ESTADOS.sono_ok)}
-      ${itemCor("vermelho", ESTADOS.sono_ruim)}${itemCor("vazio", ESTADOS.sem_marcar)}
+      ${itemCor("vermelho", ESTADOS.sono_ruim)}
     </div>
     <p class="detalhe">${T.sonoExplica}</p>`;
 }
@@ -144,7 +146,7 @@ export async function mostrarCalendario(tela, { aoAbrirDia, aoAbrirAjustes }) {
   const fim = somarDias(inicioDaSemana(montarData(ano, mes, diasNoMes)), 6);
   const registros = await lerDiasEntre(inicio, fim);
   const perfil = await lerPerfil();
-  const faixa = await faixaBackup();
+  const aviso = await avisoBackup();
   if (minhaAbertura !== aberturaAtual) return;
   const porData = Object.fromEntries(registros.map((d) => [d.data, d]));
 
@@ -155,8 +157,6 @@ export async function mostrarCalendario(tela, { aoAbrirDia, aoAbrirAjustes }) {
       <button type="button" class="seta" id="mes-seguinte" aria-label="${T.mesSeguinte}">›</button>
       <button type="button" class="seta engrenagem" id="abrir-ajustes" aria-label="${T.ajustes}">⚙︎</button>
     </header>
-
-    ${faixa}
 
     ${resumoMensal(ano, mes, porData, perfil)}
 
@@ -172,6 +172,8 @@ export async function mostrarCalendario(tela, { aoAbrirDia, aoAbrirAjustes }) {
     ${montarLegenda(perfil)}
 
     ${cartoesSemanais(ano, mes, porData, perfil)}
+
+    ${aviso ? aviso.html : ""}
   `;
 
   const redesenhar = () => mostrarCalendario(tela, { aoAbrirDia, aoAbrirAjustes });
@@ -199,5 +201,5 @@ export async function mostrarCalendario(tela, { aoAbrirDia, aoAbrirAjustes }) {
       periodo: () => ({ tipo: b.dataset.gerarPdf, inicio: b.dataset.inicio, fim: b.dataset.fim }),
     });
   });
-  tela.querySelector("#faixa-backup").onclick = aoAbrirAjustes;
+  if (aviso) aviso.ligar(tela, redesenhar);
 }
